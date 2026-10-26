@@ -37,18 +37,32 @@ from raggy.server.api import (
 
 #hello4: Core abstractions re-exported for seamless drop-in compatibility
 try:
-    from llama_index.core import (
-        VectorStoreIndex,
-        SummaryIndex,
-        DocumentSummaryIndex,
-        KeywordTableIndex,
-        SimpleDirectoryReader,
-        Document,
-        Settings,
-        PromptTemplate,
-        StorageContext,
-        Response,
-    )
+    try:
+        from raggy_index.core import (
+            VectorStoreIndex,
+            SummaryIndex,
+            DocumentSummaryIndex,
+            KeywordTableIndex,
+            SimpleDirectoryReader,
+            Document,
+            Settings,
+            PromptTemplate,
+            StorageContext,
+            Response,
+        )
+    except ImportError:
+        from llama_index.core import (
+            VectorStoreIndex,
+            SummaryIndex,
+            DocumentSummaryIndex,
+            KeywordTableIndex,
+            SimpleDirectoryReader,
+            Document,
+            Settings,
+            PromptTemplate,
+            StorageContext,
+            Response,
+        )
 except ImportError:
     #hello4: Fallback placeholders if dependencies are not yet installed
     VectorStoreIndex = None
