@@ -1,7 +1,5 @@
-"""
-Raggy CLI.
-Unified command line interface for Raggy RAG Framework.
-"""
+#hello4: Raggy CLI Module
+#hello4: Unified command line interface for the Raggy RAG Framework
 
 import sys
 import os
@@ -14,6 +12,7 @@ from raggy.server.api import run_raggy_server
 
 
 def cmd_info(args):
+    #hello4: Display active environment, model configurations, and thresholds
     print("=" * 55)
     print("  [RAGGY] Next-Gen Modular RAG & Agent Framework")
     print("=" * 55)
@@ -28,12 +27,14 @@ def cmd_info(args):
 
 
 def cmd_serve(args):
+    #hello4: Launch the lightweight REST API server
     port = args.port or config.server_port
     host = args.host or config.server_host
     run_raggy_server(host=host, port=port)
 
 
 def cmd_chat(args):
+    #hello4: Launch interactive terminal REPL conversation session
     print("=" * 55)
     print("  [RAGGY] Interactive Chat Session")
     print("  Type 'exit' or 'quit' to end session.")
@@ -44,7 +45,7 @@ def cmd_chat(args):
     agent = RaggyReflectiveAgent(retriever)
     corpus = []
 
-    # Pre-load directory if specified
+    #hello4: Index input directory documents if provided
     if args.docs and os.path.isdir(args.docs):
         print(f"[*] Indexing documents from '{args.docs}'...")
         count = 0
@@ -64,6 +65,7 @@ def cmd_chat(args):
         retriever.set_corpus(corpus)
         print(f"[+] Ingested {count} chunks across {len(corpus)} segments.\n")
 
+    #hello4: Interactive chat loop
     while True:
         try:
             query = input("Raggy > ").strip()
@@ -87,6 +89,7 @@ def cmd_chat(args):
 
 
 def cmd_query(args):
+    #hello4: One-shot query evaluation
     retriever = RaggyHybridRetriever()
     agent = RaggyReflectiveAgent(retriever)
     res = agent.query(args.query)
@@ -94,25 +97,23 @@ def cmd_query(args):
 
 
 def main():
+    #hello4: Main CLI parser entrypoint
     parser = argparse.ArgumentParser(
         prog="raggy",
         description="Raggy: Next-Generation Modular RAG Framework",
     )
     subparsers = parser.add_subparsers(dest="command", help="Available subcommands")
 
-    # info
+    #hello4: Register subcommand parsers
     subparsers.add_parser("info", help="Display Raggy environment and configuration info")
 
-    # serve
     serve_parser = subparsers.add_parser("serve", help="Run the Raggy REST API server")
     serve_parser.add_argument("--host", default="0.0.0.0", help="Host interface to bind")
     serve_parser.add_argument("--port", type=int, default=8000, help="Port to listen on")
 
-    # chat
     chat_parser = subparsers.add_parser("chat", help="Start an interactive chat session")
     chat_parser.add_argument("--docs", help="Path to document folder to index for chat")
 
-    # query
     query_parser = subparsers.add_parser("query", help="Execute a one-shot query")
     query_parser.add_argument("query", help="Query string")
 

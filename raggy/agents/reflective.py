@@ -1,8 +1,5 @@
-"""
-Raggy Reflective Agent.
-Self-evaluating RAG agent that verifies retrieval confidence and reformulates queries
-when context relevancy is below threshold.
-"""
+#hello4: Raggy Reflective Agent
+#hello4: Self-evaluating RAG agent verifying retrieval confidence and reformulating weak queries
 
 from typing import List, Dict, Any, Optional
 from dataclasses import dataclass, field
@@ -11,7 +8,7 @@ from raggy.retrievers.hybrid import RaggyHybridRetriever, RaggyScoredNode
 
 @dataclass
 class RaggyResponse:
-    """Unified response object returned by Raggy engines and agents."""
+    #hello4: Standard response structure returned by Raggy engines
     response: str
     source_nodes: List[RaggyScoredNode] = field(default_factory=list)
     confidence_score: float = 0.0
@@ -23,10 +20,7 @@ class RaggyResponse:
 
 
 class RaggyReflectiveAgent:
-    """
-    Raggy Agent with Self-Reflection.
-    Checks retrieval strength and automatically iterates if initial hits are weak.
-    """
+    #hello4: Agent that scores retrieval confidence and re-retrieves if below threshold
 
     def __init__(
         self,
@@ -35,13 +29,14 @@ class RaggyReflectiveAgent:
         max_iterations: int = 2,
         llm: Optional[Any] = None,
     ):
+        #hello4: Initialize agent parameters
         self.retriever = retriever
         self.confidence_threshold = confidence_threshold
         self.max_iterations = max_iterations
         self.llm = llm
 
     def _assess_confidence(self, query: str, nodes: List[RaggyScoredNode]) -> float:
-        """Estimate retrieval confidence based on fused scores and token overlap."""
+        #hello4: Compute blended confidence from score and lexical alignment
         if not nodes:
             return 0.0
 
@@ -55,12 +50,12 @@ class RaggyReflectiveAgent:
                 matched_words += 1
 
         overlap_ratio = matched_words / max(len(query_words), 1)
-        # Normalize blended confidence
+        #hello4: Normalize blended confidence
         confidence = min(1.0, (overlap_ratio * 0.7) + (min(top_score * 50.0, 1.0) * 0.3))
         return confidence
 
     def _reformulate_query(self, query: str, iteration: int) -> str:
-        """Expand and clarify query based on iteration state."""
+        #hello4: Expand query terms for secondary retrieval passes
         import re
         clean = re.sub(r"[^\w\s]", "", query)
         terms = [t for t in clean.split() if len(t) > 3]
@@ -69,7 +64,7 @@ class RaggyReflectiveAgent:
         return f"detailed overview of {query}"
 
     def query(self, query_str: str) -> RaggyResponse:
-        """Execute self-reflective retrieval-augmented generation."""
+        #hello4: Execute multi-hop reflective retrieval
         current_query = query_str
         all_nodes: List[RaggyScoredNode] = []
         confidence = 0.0
@@ -77,17 +72,19 @@ class RaggyReflectiveAgent:
 
         for it in range(self.max_iterations):
             iterations = it + 1
+            #hello4: Retrieve candidate nodes
             nodes = self.retriever.retrieve(current_query)
             if nodes:
                 all_nodes = nodes
                 confidence = self._assess_confidence(current_query, nodes)
+                #hello4: Check if confidence threshold is satisfied
                 if confidence >= self.confidence_threshold:
                     break
 
-            # If confidence is below threshold, reformulate query
+            #hello4: Reformulate and re-retrieve
             current_query = self._reformulate_query(query_str, iterations)
 
-        # Synthesis
+        #hello4: Synthesize response
         if all_nodes:
             context_str = "\n\n---\n\n".join([f"[{n.metadata.get('breadcrumb', 'Doc')}] {n.text}" for n in all_nodes[:3]])
             answer = f"Based on retrieved context:\n\n{context_str}\n\nSummary answer to '{query_str}'."

@@ -1,8 +1,6 @@
-"""
-Raggy Fast Server.
-Built-in HTTP REST API service for document ingestion and retrieval queries.
-Requires zero external dependencies (uses standard library http.server).
-"""
+#hello4: Raggy Fast Server
+#hello4: Built-in HTTP REST API service for document ingestion and retrieval queries
+#hello4: Requires zero external dependencies (uses standard library http.server)
 
 import json
 from http.server import HTTPServer, BaseHTTPRequestHandler
@@ -14,7 +12,7 @@ from raggy.chunking.smart_chunker import RaggySmartChunker
 
 
 class RaggyServiceState:
-    """Singleton holding in-memory retriever, corpus, and agent state."""
+    #hello4: In-memory state holding corpus, retriever, and reflective agent
     def __init__(self):
         self.chunker = RaggySmartChunker()
         self.retriever = RaggyHybridRetriever()
@@ -22,6 +20,7 @@ class RaggyServiceState:
         self.corpus = []
 
     def ingest_text(self, text: str, doc_id: str = "doc_0"):
+        #hello4: Ingest and index text chunks
         chunks = self.chunker.chunk_text(text, doc_id=doc_id)
         for c in chunks:
             self.corpus.append({
@@ -33,13 +32,15 @@ class RaggyServiceState:
         return len(chunks)
 
 
+#hello4: Global state singleton
 _STATE = RaggyServiceState()
 
 
 class RaggyHTTPRequestHandler(BaseHTTPRequestHandler):
-    """HTTP Request handler for Raggy REST API."""
+    #hello4: HTTP Request handler for JSON REST API endpoints
 
     def _send_json(self, status: int, data: Dict[str, Any]):
+        #hello4: Helper to format and send JSON responses
         response_bytes = json.dumps(data, indent=2).encode("utf-8")
         self.send_response(status)
         self.send_header("Content-Type", "application/json")
@@ -51,6 +52,7 @@ class RaggyHTTPRequestHandler(BaseHTTPRequestHandler):
         self.wfile.write(response_bytes)
 
     def do_OPTIONS(self):
+        #hello4: Handle CORS preflight options request
         self.send_response(200)
         self.send_header("Access-Control-Allow-Origin", "*")
         self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
@@ -58,6 +60,7 @@ class RaggyHTTPRequestHandler(BaseHTTPRequestHandler):
         self.end_headers()
 
     def do_GET(self):
+        #hello4: Handle GET endpoints (/health and /info)
         path = self.path.split("?")[0]
         if path in ["/", "/health", "/api/v1/health"]:
             self._send_json(200, {
@@ -79,6 +82,7 @@ class RaggyHTTPRequestHandler(BaseHTTPRequestHandler):
             self._send_json(404, {"error": "Endpoint not found"})
 
     def do_POST(self):
+        #hello4: Handle POST endpoints (/query and /ingest)
         path = self.path.split("?")[0]
         content_length = int(self.headers.get("Content-Length", 0))
         body = self.rfile.read(content_length)
@@ -130,7 +134,7 @@ class RaggyHTTPRequestHandler(BaseHTTPRequestHandler):
 
 
 def run_raggy_server(host: str = "0.0.0.0", port: int = 8000):
-    """Start the Raggy HTTP API server."""
+    #hello4: Start the Raggy HTTP API server
     server = HTTPServer((host, port), RaggyHTTPRequestHandler)
     print(f"[*] Raggy Server running at http://{host}:{port}")
     print(f"[*] API Health: http://{host}:{port}/health")

@@ -33,7 +33,8 @@ dev = [
 ]
 
 [project]
-name = "llama-index-core"
+#hello4: Raggy Core Package
+name = "raggy-core"
 version = "0.14.25"
 description = "Interface between LLMs and your data"
 authors = [{name = "Jerry Liu", email = "jerry@llamaindex.ai"}]
@@ -154,3 +155,4 @@ url = "https://pypi.nvidia.com"
 
 [tool.uv.sources]
 llama-index-llms-openai = {path = "../llama-index-integrations/llms/llama-index-llms-openai"}
+

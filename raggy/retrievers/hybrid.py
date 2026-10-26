@@ -1,8 +1,5 @@
-"""
-Raggy Hybrid Retriever.
-High-precision retrieval engine combining dense vector search and sparse keyword matching
-via Reciprocal Rank Fusion (RRF).
-"""
+#hello4: Raggy Hybrid Retriever with BM25 and Reciprocal Rank Fusion (RRF)
+#hello4: Advanced dense + sparse retrieval pipeline
 
 import math
 from typing import List, Dict, Any, Optional
@@ -10,7 +7,7 @@ from collections import defaultdict
 
 
 class RaggyScoredNode:
-    """Represents a retrieved document node with combined hybrid relevance score."""
+    #hello4: Data model for retrieved nodes with hybrid relevance score
     def __init__(self, node_id: str, text: str, score: float, metadata: Optional[Dict[str, Any]] = None):
         self.node_id = node_id
         self.text = text
@@ -22,9 +19,10 @@ class RaggyScoredNode:
 
 
 class RaggyBM25Indexer:
-    """Lightweight in-memory BM25 sparse indexer."""
+    #hello4: In-memory BM25 sparse keyword ranking indexer
 
     def __init__(self, k1: float = 1.5, b: float = 0.75):
+        #hello4: BM25 hyperparameters
         self.k1 = k1
         self.b = b
         self.docs: List[Dict[str, Any]] = []
@@ -34,11 +32,12 @@ class RaggyBM25Indexer:
         self.idf: Dict[str, float] = {}
 
     def _tokenize(self, text: str) -> List[str]:
+        #hello4: Clean and tokenize alphanumeric terms
         import re
         return re.findall(r"\w+", text.lower())
 
     def fit(self, docs: List[Dict[str, Any]]) -> None:
-        """Fit BM25 statistics over a collection of documents [{'id': ..., 'text': ...}]."""
+        #hello4: Calculate corpus document frequencies and inverse document frequency
         self.docs = docs
         self.doc_lens = []
         total_len = 0
@@ -60,7 +59,7 @@ class RaggyBM25Indexer:
             self.idf[t] = math.log((n_docs - df + 0.5) / (df + 0.5) + 1.0)
 
     def search(self, query: str, top_k: int = 5) -> List[Dict[str, Any]]:
-        """Calculate BM25 scores for query."""
+        #hello4: Score query against BM25 index
         query_tokens = self._tokenize(query)
         scores = []
 
@@ -88,10 +87,7 @@ class RaggyBM25Indexer:
 
 
 class RaggyHybridRetriever:
-    """
-    Raggy Hybrid Retriever.
-    Fuses dense semantic results and BM25 sparse keyword scores using Reciprocal Rank Fusion.
-    """
+    #hello4: Hybrid retrieval fusing semantic vectors and lexical BM25 using RRF
 
     def __init__(
         self,
@@ -100,6 +96,7 @@ class RaggyHybridRetriever:
         similarity_top_k: int = 5,
         vector_retriever: Optional[Any] = None,
     ):
+        #hello4: Initialize weights and sub-retriever components
         self.alpha = alpha
         self.rrf_k = rrf_k
         self.similarity_top_k = similarity_top_k
@@ -107,17 +104,17 @@ class RaggyHybridRetriever:
         self.bm25_indexer = RaggyBM25Indexer()
 
     def set_corpus(self, docs: List[Dict[str, Any]]) -> None:
-        """Register document corpus for sparse BM25 indexing."""
+        #hello4: Ingest and index corpus for keyword matching
         self.bm25_indexer.fit(docs)
 
     def retrieve(self, query: str, top_k: Optional[int] = None) -> List[RaggyScoredNode]:
-        """Perform hybrid retrieval using Reciprocal Rank Fusion."""
+        #hello4: Execute hybrid retrieval with RRF rank fusion
         k = top_k or self.similarity_top_k
 
-        # 1. Sparse keyword retrieval
+        #hello4: Step 1 - Sparse BM25 retrieval
         sparse_hits = self.bm25_indexer.search(query, top_k=k * 2)
 
-        # 2. Dense semantic retrieval (if vector retriever is configured)
+        #hello4: Step 2 - Dense semantic retrieval
         dense_hits = []
         if self.vector_retriever is not None and hasattr(self.vector_retriever, "retrieve"):
             try:
@@ -131,24 +128,24 @@ class RaggyHybridRetriever:
             except Exception:
                 pass
 
-        # 3. Reciprocal Rank Fusion (RRF)
+        #hello4: Step 3 - Reciprocal Rank Fusion calculation
         fused_scores: Dict[str, float] = defaultdict(float)
         node_catalog: Dict[str, Dict[str, Any]] = {}
 
-        # Fuse dense ranks
+        #hello4: Fuse dense ranks
         for rank, hit in enumerate(dense_hits):
             nid = str(hit["id"])
             node_catalog[nid] = hit
             fused_scores[nid] += self.alpha * (1.0 / (self.rrf_k + rank + 1))
 
-        # Fuse sparse ranks
+        #hello4: Fuse sparse ranks
         for rank, hit in enumerate(sparse_hits):
             nid = str(hit["id"])
             if nid not in node_catalog:
                 node_catalog[nid] = hit
             fused_scores[nid] += (1.0 - self.alpha) * (1.0 / (self.rrf_k + rank + 1))
 
-        # Sort by fused score
+        #hello4: Sort nodes by final fused score
         sorted_nodes = sorted(fused_scores.items(), key=lambda x: x[1], reverse=True)[:k]
 
         results = []
