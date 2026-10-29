@@ -34,6 +34,10 @@ from raggy.server.api import (
     run_raggy_server,
     RaggyServiceState,
 )
+from raggy.readers.extractor import (
+    RaggyDocumentExtractor,
+    document_extractor,
+)
 
 #hello4: Core abstractions re-exported for seamless drop-in compatibility
 try:
@@ -90,6 +94,8 @@ __all__ = [
     "RaggyResponse",
     "run_raggy_server",
     "RaggyServiceState",
+    "RaggyDocumentExtractor",
+    "document_extractor",
     "VectorStoreIndex",
     "SummaryIndex",
     "DocumentSummaryIndex",

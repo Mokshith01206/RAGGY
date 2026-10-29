@@ -88,6 +88,43 @@ def cmd_chat(args):
             break
 
 
+def cmd_upload(args):
+    #hello4: Extract and chat with a single uploaded document
+    from raggy.readers.extractor import RaggyDocumentExtractor
+    file_path = args.file
+    if not os.path.exists(file_path):
+        print(f"[!] File not found: {file_path}")
+        return
+
+    print(f"[*] Extracting text from '{os.path.basename(file_path)}'...")
+    extractor = RaggyDocumentExtractor(chunk_size=config.chunk_size, chunk_overlap=config.chunk_overlap)
+    extracted = extractor.extract_and_chunk(file_path)
+    chunks = extracted["chunks"]
+    print(f"[+] Extracted {extracted['total_chars']} chars across {len(chunks)} chunks (Format: {extracted['format'].upper()}, Pages: {extracted['page_count']})")
+
+    retriever = RaggyHybridRetriever(alpha=config.hybrid_alpha)
+    retriever.set_corpus([{"id": c.chunk_id, "text": c.text, "metadata": c.metadata} for c in chunks])
+    agent = RaggyReflectiveAgent(retriever)
+
+    print("\n" + "=" * 55)
+    print(f"  [RAGGY] Q&A over '{os.path.basename(file_path)}'")
+    print("  Type 'exit' or 'q' to end.")
+    print("=" * 55)
+
+    while True:
+        try:
+            q = input("\nAsk > ").strip()
+            if not q or q.lower() in ["exit", "quit", "q"]:
+                break
+            res = agent.query(q)
+            print(f"\n[Answer]:\n{res.response}")
+            if res.source_nodes:
+                print(f"[Sources]: {res.source_nodes[0].metadata.get('breadcrumb', 'Doc')}")
+            print("-" * 55)
+        except (KeyboardInterrupt, EOFError):
+            break
+
+
 def cmd_query(args):
     #hello4: One-shot query evaluation
     retriever = RaggyHybridRetriever()
@@ -117,6 +154,9 @@ def main():
     query_parser = subparsers.add_parser("query", help="Execute a one-shot query")
     query_parser.add_argument("query", help="Query string")
 
+    upload_parser = subparsers.add_parser("upload", help="Upload a document, extract text, and start RAG Q&A")
+    upload_parser.add_argument("file", help="Path to PDF, TXT, MD, CSV, or JSON document")
+
     args = parser.parse_args()
 
     if args.command == "info":
@@ -125,6 +165,8 @@ def main():
         cmd_serve(args)
     elif args.command == "chat":
         cmd_chat(args)
+    elif args.command == "upload":
+        cmd_upload(args)
     elif args.command == "query":
         cmd_query(args)
     else:
