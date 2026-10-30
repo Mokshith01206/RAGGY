@@ -46,9 +46,9 @@ all = [
 raggy = "raggy.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/raggy-ai/raggy"
-Repository = "https://github.com/raggy-ai/raggy"
-Documentation = "https://github.com/raggy-ai/raggy#readme"
+Homepage = "https://github.com/Mokshith01206/RAGGY"
+Repository = "https://github.com/Mokshith01206/RAGGY"
+Documentation = "https://github.com/Mokshith01206/RAGGY#readme"
 
 [tool.hatch.build.targets.wheel]
 packages = ["raggy"]

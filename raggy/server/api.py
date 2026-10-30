@@ -98,12 +98,12 @@ RAGGY_HTML_UI = """<!DOCTYPE html>
 </head>
 <body>
   <div class="sidebar">
-    <div class="logo">⚡ Raggy Studio</div>
-    <div class="subtitle">Next-Gen Document RAG & Text Extraction</div>
+    <div class="logo">Raggy Studio</div>
+    <div class="subtitle">Next-Gen Document RAG and Text Extraction</div>
 
     <div class="dropzone" id="dropzone" onclick="document.getElementById('fileInput').click()">
-      <div style="font-size: 2rem;">📄</div>
-      <p><strong>Click to upload</strong> or drag & drop</p>
+      <div style="font-size: 1.1rem; font-weight: 700; color: #38bdf8; margin-bottom: 6px;">[UPLOAD]</div>
+      <p><strong>Click to upload</strong> or drag and drop</p>
       <span>Supports PDF, TXT, MD, JSON, CSV</span>
       <input type="file" id="fileInput" accept=".pdf,.txt,.md,.json,.csv,.py" onchange="uploadFile(this.files[0])">
     </div>
@@ -111,7 +111,7 @@ RAGGY_HTML_UI = """<!DOCTYPE html>
     <div class="doc-list">
       <h4>Indexed Documents (<span id="docCount">0</span>)</h4>
       <div id="docsContainer">
-        <p style="font-size: 0.8rem; color: #64748b;">No documents uploaded yet. Upload a PDF or TXT to start asking questions!</p>
+        <p style="font-size: 0.8rem; color: #64748b;">No documents uploaded yet. Upload a PDF or TXT to start asking questions.</p>
       </div>
     </div>
   </div>
@@ -127,7 +127,7 @@ RAGGY_HTML_UI = """<!DOCTYPE html>
 
     <div class="chat-container" id="chat">
       <div class="message assistant">
-        👋 Welcome to <strong>Raggy</strong>! Upload any document (PDF, TXT, MD) using the panel on the left, and I will extract the text, chunk it hierarchically, and answer your questions with precise citations.
+        Welcome to <strong>Raggy</strong>. Upload any document (PDF, TXT, MD) using the panel on the left to extract text, generate hierarchical chunks, and perform grounded Q&A.
       </div>
     </div>
 
@@ -183,7 +183,7 @@ RAGGY_HTML_UI = """<!DOCTYPE html>
       const card = document.createElement('div');
       card.className = 'doc-card';
       card.innerHTML = `
-        <div class="name">📄 ${doc.filename}</div>
+        <div class="name">[FILE] ${doc.filename}</div>
         <div class="stats">${doc.format.toUpperCase()} • ${doc.chunk_count} chunks • ${doc.total_chars} chars</div>
         <div class="preview">${doc.preview}</div>
       `;

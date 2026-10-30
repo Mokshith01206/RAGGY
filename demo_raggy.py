@@ -86,9 +86,7 @@ telecommunications, computers, and fuel cell energy storage.
             print(f"    - Top Match Path:       {top_hit.metadata.get('breadcrumb')}")
         print(f"\n[Raggy Output]:\n{res.response}")
 
-    print("\n" + "=" * 60)
-    print("  [SUCCESS] All Raggy components executed successfully!")
-    print("=" * 60)
+        print("  SUCCESS All Raggy components executed successfully!")
 
 if __name__ == "__main__":
     #hello4: Run main execution
